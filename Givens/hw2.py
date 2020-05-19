@@ -57,24 +57,36 @@ def readParseData(file_name):
     # TODO Part A, Task 3.4
     with open(file_name,'r') as f:
         lines=f.readlines()
-    print(lines)
 
     split_data=[line.split() for line in lines]
-    print("\nthis is the split data:\n",split_data)
 
     competitors_data=[elem for elem in split_data if elem[0]=='competitor']
     competitions_data=[elem for elem in split_data if elem[0]=='competition']
 
     competitors={int(elem[1]):elem[2] for elem in competitors_data}
-    competitions=[{"competition name":competition[1],"competition type":competition[3],"competitor id":int(competition[2]),"competitor country":competitors.get(int(competition[2])),"result":int(competition[-1])} for competition in competitions_data]
-    print("\nthe competitors are:\n",competitors)
 
-    print("\nthe competitions are:\n",competitions)
+    competitions=[{"competition name":competition[1],
+        "competition type":competition[3],
+        "competitor id":int(competition[2]),
+        "competitor country":competitors.get(int(competition[2])),
+        "result":int(competition[-1])}
+        for competition in competitions_data]
+
 
     competitors_in_competitions=competitions
     return competitors_in_competitions
 
+def split_by_competition_name(competitors_in_competitions):
+    list_of_competitions=[elem.get("competition name") for elem in competitors_in_competitions]
+    list_of_competitions=list(dict.fromkeys(list_of_competitions))
+    splited_list=[]
+    for competition in list_of_competitions:
+        competitors_in_specific=[elem for elem in competitors_in_competitions if elem.get("competition name")==competition]
+        splited_list.append(competitors_in_specific)
+    return splited_list
 
+    
+    
 def calcCompetitionsResults(competitors_in_competitions):
     '''
     Given the data of the competitors, the function returns the champs countries for each competition.
@@ -88,9 +100,47 @@ def calcCompetitionsResults(competitors_in_competitions):
     '''
     competitions_champs = []
     # TODO Part A, Task 3.5
+    splited_list=split_by_competition_name(competitors_in_competitions)
     
+     
+    no_repetitions = [strike_repetitions(single_competition) for single_competition in splited_list]
+    
+    for elem in no_repetitions:
+
+        if not elem:
+            continue
+        sorted_=sorted(elem, key=key_sort_competitor) 
+        
+        
+
+        if sorted_[0].get("competition type")=="untimed":
+            sorted_.reverse()
+
+        if len(sorted_) < 3:
+            sorted_.extend([{"competitor country":"undef_country"}] * (3-len(sorted_)))
+
+        competion_name=sorted_[0].get("competition name")
+        first_place=sorted_[0].get("competitor country")
+        second_place=sorted_[1].get("competitor country")
+        third_place=sorted_[2].get("competitor country")
+        competitions_champs.append([competion_name,first_place,second_place,third_place])
+        
+
     return competitions_champs
 
+def strike_repetitions(single_competition):
+    existing_competitors = []
+    repetitions = []
+    for elem in single_competition:
+        if elem.get("competitor id") in existing_competitors:
+            repetitions.append(elem.get("competitor id"))
+        else:
+            existing_competitors.append(elem.get("competitor id"))
+    
+    no_repetitions = [elem for elem in single_competition if not(elem.get("competitor id") in repetitions)]
+    return no_repetitions       
+        
+    
 
 def partA(file_name = 'input.txt', allow_prints = True):
     # read and parse the input file
