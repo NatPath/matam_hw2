@@ -160,6 +160,14 @@ def partA(file_name = 'input.txt', allow_prints = True):
 
 def partB(file_name = 'input.txt'):
     competitions_results = partA(file_name, allow_prints = False)
+    import Olympics
+
+    o=Olympics.OlympicsCreate()
+    for competition in competitions_results:
+        Olympics.OlympicsUpdateCompetitionResults(o,str(competition[1]),str(competition[2]),str(competition[3]))
+    Olympics.OlympicsWinningCountry(o)
+    Olympics.OlympicsDestroy(o)
+
     # TODO Part B
 
 
@@ -171,9 +179,7 @@ if __name__ == "__main__":
     To run only a single part, comment the line below which correspondes to the part you don't want to run.
     '''    
     file_name = 'input.txt'
-    file_name_mine='tests/in/test1.txt'
+    file_name_mine='tests/in/test2.txt'
 
     partA(file_name_mine)
-    '''
-    partB(file_name)
-    '''
+    partB(file_name_mine)
